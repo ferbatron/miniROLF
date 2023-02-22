@@ -139,6 +139,7 @@ function LogOut() {
     xhr.onload = function () {
         if (xhr.status == 200 && xhr.readyState == 4) {
             localStorage.removeItem('token');
+            document.cookie = "username=refreshToken; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             console.log("logout ok");
             location.reload();
         } else {
@@ -209,6 +210,9 @@ window.onload = function() {
         else {
             start.insertAdjacentHTML('beforebegin', '<p align=\"right\"><label>Добро пожаловать, ' + resolve['first_name'] + ' </label><button onclick="LogOut()">Выход</button></p>');
             start.insertAdjacentHTML('beforebegin', '<p align=\"right\" class=\"basket_length\"><a href="#basket"><button>Корзина</button></a></p>');
+            let adminPanel = document.createElement('p');
+            adminPanel.innerHTML += '<a href="create.html"><button>Админ панель</button></a>';
+            document.body.appendChild(adminPanel);
             GetBasket();
         }
     });

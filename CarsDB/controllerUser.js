@@ -174,6 +174,22 @@ class UserController {
 		}
 	}
 
+	async checkTokenAdmin(req, res) {
+		try {
+			const result = await service.checkTokenAdmin(req.headers.authorization);
+			res.status(200).json(result);
+			console.log("get ok");
+		} catch (e) {
+			console.log("get error!");
+			if(e.name == "NoAuthorizatinon")
+				res.status(401).json(e);
+			else if(e.name == "NoAuthorizatinonAdmin")
+				res.status(403).json(e);
+			else
+				res.status(500).json(e);
+		}
+	}
+
 	async updateToken(req, res) {
 		try {
 			const result = await service.updateToken(req.cookies);

@@ -35,10 +35,7 @@ class TokenAccess {
 	async saveTokenToDB(id, token) {
 		const findeUser = await db.query(`SELECT * FROM tokens WHERE user_id = '${id}'`);
 		if(findeUser.rowCount == 0) {
-			const newPerson = await db.query(
-				`INSERT INTO tokens (user_id, token, date) values ($1, $2, NOW()) RETURNING *`, 
-				[id, token]
-			);
+			const newPerson = await db.query(`INSERT INTO tokens (user_id, token, date) values ('${id}', '${token}', NOW()) RETURNING *`);
 			return true;
 		}
 		const tokenEdit = await db.query( `UPDATE tokens SET token = '${token}', date = NOW() WHERE user_id = '${id}' RETURNING *`);

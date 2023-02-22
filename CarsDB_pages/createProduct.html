@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Добавить машину</title>
     <script src="JS/CreatorRequest.js"></script>
+    <script src="JS/authorizationСheck.js"></script>
 </head>
 <body>
     <button onclick="getCars()">Машины</button>
@@ -26,7 +27,7 @@
     <p>Фото:</p>
     <p><input type="file" id="photo" accept="image/*,image/jpeg"></p>
 
-    <p><button onclick="sendJSON()">Отправить</button></p>
+    <p><button onclick="sendJSONProduct()">Отправить</button></p>
     <button onclick="getCars()">Машины</button>
     <a href="finde.html"><button>Найти машины</button></a>
     <a href="update.html"><button>Обновить машину</button></a>

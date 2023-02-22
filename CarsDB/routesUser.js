@@ -13,6 +13,7 @@ router.get('/brands', userConroller.getBarnds);
 router.get('/models', userConroller.getModels);
 router.get('/updatetoken', userConroller.updateToken);
 router.get('/checktoken', userConroller.checkToken);
+router.get('/checktokenadmin', userConroller.checkTokenAdmin);
 router.get('/quintation', userConroller.getQuintation);
 router.get('/getbasket', userConroller.getBasket);
 

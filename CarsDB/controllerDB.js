@@ -3,34 +3,49 @@ const service = require('./serviceDB');
 class DbController {
 	async createCar(req, res) {
 		try {
-			const result = await service.createCar(req.body);
+			const result = await service.createCar(req.body, req.headers.authorization);
 			res.status(200).json(result);
 			console.log("post ok");
 		} catch (e) {
 			console.log("post error!");
-			res.status(500).json(e);
+			if(e.name == "NoAuthorizatinon")
+				res.status(401).json(e);
+			else if (e.name == "NoAuthorizatinonAdmin")
+				res.status(403).json(e);
+			else
+				res.status(500).json(e);
 		}
 	}
 
 	async createProduct(req, res) {
 		try {
-			const result = await service.createProduct(req.body);
+			const result = await service.createProduct(req.body, req.headers.authorization);
 			res.status(200).json(result);
 			console.log("post ok");
 		} catch (e) {
 			console.log("post error!");
-			res.status(500).json(e);
+			if(e.name == "NoAuthorizatinon")
+				res.status(401).json(e);
+			else if (e.name == "NoAuthorizatinonAdmin")
+				res.status(403).json(e);
+			else
+				res.status(500).json(e);
 		}
 	}
 
 	async newPicture(req, res) {
 		try {
-			const result = await service.newPicture(req);
+			const result = await service.newPicture(req, req.headers.authorization);
 			res.status(200).json(result);
 			console.log("post ok");
 		} catch (e) {
 			console.log("post error!");
-			res.status(500).json(e);
+			if(e.name == "NoAuthorizatinon")
+				res.status(401).json(e);
+			else if (e.name == "NoAuthorizatinonAdmin")
+				res.status(403).json(e);
+			else
+				res.status(500).json(e);
 		}
 	}
 
@@ -41,7 +56,12 @@ class DbController {
 			console.log("get ok");
 		} catch (e) {
 			console.log("get error!");
-			res.status(500).json(e);
+			if(e.name == "NoAuthorizatinon")
+				res.status(401).json(e);
+			else if (e.name == "NoAuthorizatinonAdmin")
+				res.status(403).json(e);
+			else
+				res.status(500).json(e);
 		}
 	}
 
@@ -52,40 +72,60 @@ class DbController {
 			console.log("get ok");
 		} catch (e) {
 			console.log("get error!");
-			res.status(500).json(e);
+			if(e.name == "NoAuthorizatinon")
+				res.status(401).json(e);
+			else if (e.name == "NoAuthorizatinonAdmin")
+				res.status(403).json(e);
+			else
+				res.status(500).json(e);
 		}
 	}
 
 	async editCar(req, res) {
 		try {
-			const result = await service.editCar(req.query);
+			const result = await service.editCar(req.query, req.headers.authorization);
 			res.status(200).json(result);
 			console.log("put ok");
 		} catch (e) {
 			console.log("put error!");
-			res.status(500).json(e);
+			if(e.name == "NoAuthorizatinon")
+				res.status(401).json(e);
+			else if (e.name == "NoAuthorizatinonAdmin")
+				res.status(403).json(e);
+			else
+				res.status(500).json(e);
 		}
 	}
 
 	async deleteCar(req, res) {
 		try {
-			const result = await service.deleteCar(req.query);
+			const result = await service.deleteCar(req.query, req.headers.authorization);
 			res.status(200).json(result);
 			console.log("delete ok");
 		} catch (e) {
 			console.log("delete error!");
-			res.status(500).json(e);
+			if(e.name == "NoAuthorizatinon")
+				res.status(401).json(e);
+			else if (e.name == "NoAuthorizatinonAdmin")
+				res.status(403).json(e);
+			else
+				res.status(500).json(e);
 		}
 	}
 
 	async findeQuarter(req, res) {
 		try {
-			const result = await service.findeQuarter(req.query);
+			const result = await service.findeQuarter(req.query, req.headers.authorization);
 			res.status(200).json(result);
 			console.log("get ok");
 		} catch (e) {
 			console.log("get error!");
-			res.status(500).json(e);
+			if(e.name == "NoAuthorizatinon")
+				res.status(401).json(e);
+			else if (e.name == "NoAuthorizatinonAdmin")
+				res.status(403).json(e);
+			else
+				res.status(500).json(e);
 		}
 	}
 }

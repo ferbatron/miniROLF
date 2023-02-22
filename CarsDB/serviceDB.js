@@ -2,9 +2,18 @@ const db = require('./postgresDB');
 const multiparty = require('multiparty');
 const {port, IMAGE_DIR} = require("./config");
 const fs = require('fs');
+const authentication = require('./authentication');
 
 class ApiService {
-	async createCar(data) {
+	async createCar(data, authorization) {
+		const userData = authentication(authorization);
+		if(userData.role != 'ADMIN') {
+			let error = new Error();
+			error.name = "NoAuthorizatinonAdmin";
+			error.message = "Пользователь не авторизирован как админ!";
+			throw error;
+		}
+
 		const {brand, model, color, date, body, power, transmition, engine, unit, country, price, photo} = data;
 		let url_photo = `http://localhost:${port}/Cars/${photo}`;
 		const newCar = await db.query(
@@ -15,7 +24,15 @@ class ApiService {
 		return (newCar.rows[0]);
 	}
 
-	async createProduct(data) {
+	async createProduct(data, authorization) {
+		const userData = authentication(authorization);
+		if(userData.role != 'ADMIN') {
+			let error = new Error();
+			error.name = "NoAuthorizatinonAdmin";
+			error.message = "Пользователь не авторизирован как админ!";
+			throw error;
+		}
+
 		const {name, description, price, photo} = data;
 		let url_photo = `http://localhost:${port}/Cars/${photo}`;
 		const newProduct = await db.query(
@@ -26,7 +43,15 @@ class ApiService {
 		return (newProduct.rows[0]);
 	}
 
-	async newPicture(data) {
+	async newPicture(data, authorization) {
+		const userData = authentication(authorization);
+		if(userData.role != 'ADMIN') {
+			let error = new Error();
+			error.name = "NoAuthorizatinonAdmin";
+			error.message = "Пользователь не авторизирован как админ!";
+			throw error;
+		}
+
 		let form = new multiparty.Form({uploadDir: `./${IMAGE_DIR}`});
 		await form.parse(data, (err, fields, files) => {
 			if(err){ 
@@ -63,7 +88,15 @@ class ApiService {
 		return (carsWithParams.rows);
 	}
 
-	async editCar(data) {
+	async editCar(data, authorization) {
+		const userData = authentication(authorization);
+		if(userData.role != 'ADMIN') {
+			let error = new Error();
+			error.name = "NoAuthorizatinonAdmin";
+			error.message = "Пользователь не авторизирован как админ!";
+			throw error;
+		}
+
 		const {id, brand, model, color, date, body, power, transmition, engine, unit, country, price, photo} = data;
 		if(id == undefined || id == '')
 			return "Ошибка: не указан id!!!";
@@ -79,12 +112,28 @@ class ApiService {
 		return (carEdits.rows);
 	}
 
-	async deleteCar(data) {
+	async deleteCar(data, authorization) {
+		const userData = authentication(authorization);
+		if(userData.role != 'ADMIN') {
+			let error = new Error();
+			error.name = "NoAuthorizatinonAdmin";
+			error.message = "Пользователь не авторизирован как админ!";
+			throw error;
+		}
+
 		const carDelete = await db.query( `DELETE FROM cars WHERE car_id = ${data.id} RETURNING *`);
 		return (carDelete.rows);
 	}
 
-	async findeQuarter(data) {
+	async findeQuarter(data, authorization) {
+		const userData = authentication(authorization);
+		if(userData.role != 'ADMIN') {
+			let error = new Error();
+			error.name = "NoAuthorizatinonAdmin";
+			error.message = "Пользователь не авторизирован как админ!";
+			throw error;
+		}
+
 		let {quarter} = data;
 		let quarterDB = {};
 		if(quarter == "All") {

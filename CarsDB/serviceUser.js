@@ -17,8 +17,8 @@ class UserService {
 
 		if(findePerson.rowCount == 0) {
 			const newPerson = await db.query(
-				`INSERT INTO persons (email, first_name, last_name, middle_name, telephone, password) values ($1, $2, $3, $4, $5, $6) RETURNING *`, 
-				[email, first_name, last_name, middle_name, telephone, hashPassword]
+				`INSERT INTO persons (email, first_name, last_name, middle_name, telephone, password, role) values ($1, $2, $3, $4, $5, $6, $7) RETURNING *`, 
+				[email, first_name, last_name, middle_name, telephone, hashPassword, 'USER']
 			);
 			console.log(email, first_name, last_name, middle_name, telephone, hashPassword);
 			await mailSender.sendRegMail(email);
@@ -48,8 +48,9 @@ class UserService {
 
 			const user_id = findePerson.rows[0].id;
 			const first_name = findePerson.rows[0].first_name;
+			const role = findePerson.rows[0].role;
 			const findeUser = await access.findeToken(user_id);
-			const token = access.generateToken({user_id, first_name, email});
+			const token = access.generateToken({user_id, first_name, email, role});
 			let refreshToken = "";
 			if(findeUser.rowCount == 1) {
 				refreshToken = findeUser.rows[0].token;
@@ -57,7 +58,7 @@ class UserService {
 				if(userData)
 					return {token, refreshToken};
 			}
-			refreshToken = access.generateRefreshToken({user_id, first_name, email});
+			refreshToken = access.generateRefreshToken({user_id, first_name, email, role});
 			await access.saveTokenToDB(user_id, refreshToken);
 
 			return {token, refreshToken};
@@ -176,17 +177,22 @@ class UserService {
 		const cars = await db.query( `UPDATE cars SET sale = false 
 									  WHERE car_id IN (SELECT product_id FROM baskets WHERE person_id = ${userData.user_id} AND product_type = '${car_type}'
 									  AND NOT EXISTS(SELECT * FROM orders WHERE basket_id = baskets.id)) 
-									  AND sale = true RETURNING *`);
+									  AND sale = true RETURNING car_id`);
 
 		const items = await db.query( `UPDATE items SET sale = false 
 									  WHERE id IN (SELECT product_id FROM baskets WHERE person_id = ${userData.user_id} AND product_type = '${item_type}'
 									  AND NOT EXISTS(SELECT * FROM orders WHERE basket_id = baskets.id)) 
-									  AND sale = true RETURNING *`);
+									  AND sale = true RETURNING id`);
 
 		if(cars.rowCount != 0 || items.rowCount != 0) {
 			const order = await db.query(`INSERT INTO orders (basket_id, payment_date) values (${idBasket.rows[0].id}, NULL) RETURNING *`);
 
 			await mailSender.sendQuintationMail(userData.email, order.rows[0].id, [cars.rows, items.rows]);
+
+			const deleteBaskets = await db.query(`DELETE FROM baskets AS B1 
+												  WHERE ((B1.product_id IN (SELECT B2.product_id FROM baskets AS B2 WHERE B2.person_id = '${userData.user_id}' AND B2.product_type = '${car_type}'))
+												  OR (B1.product_id IN (SELECT B3.product_id FROM baskets AS B3 WHERE B3.person_id = '${userData.user_id}' AND B3.product_type = '${item_type}')))
+												  AND B1.person_id != '${userData.user_id}' RETURNING *`);
 
 			return order.rows[0];
 		}
@@ -253,6 +259,20 @@ class UserService {
 		return {first_name};
 	}
 
+	async checkTokenAdmin(token) {
+		const userData = authentication(token);
+		if(userData.role != 'ADMIN') {
+			let error = new Error();
+			error.name = "NoAuthorizatinonAdmin";
+			error.message = "Пользователь не авторизирован как админ!";
+			throw error;
+		}
+
+		const first_name = userData.first_name;
+
+		return {first_name};
+	}
+
 	async updateToken(data) {
 		const {refreshToken} = data;
 
@@ -275,7 +295,8 @@ class UserService {
 		const findePerson = await db.query(`SELECT * FROM persons WHERE id = '${user_id}'`);
 		const first_name = findePerson.rows[0].first_name;
 		const email = findePerson.rows[0].email;
-		const newToken = access.generateToken({user_id, first_name, email});
+		const role = findePerson.rows[0].role;
+		const newToken = access.generateToken({user_id, first_name, email, role});
 
 		return {newToken};
 	}
